@@ -3,8 +3,8 @@
 namespace Scrutinizer\Ocular\Command\CodeCoverage;
 
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientErrorResponseException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Scrutinizer\Ocular\Util\RepositoryIntrospector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,7 +28,7 @@ class UploadCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $repositoryName = $this->parseRepositoryName($input->getOption('repository'));
 
@@ -36,7 +36,7 @@ class UploadCommand extends Command
             'base_uri' => $input->getOption('api-url'),
             'query' => array('access_token' => $input->getOption('access-token')),
         ));
-        
+
         $postData = $this->generatePostData($input);
         if ( ! isset($postData['coverage'])) {
             $output->write(sprintf('Notifying that no code coverage data is available for repository "%s" and revision "%s"... ', $repositoryName, $postData['revision']));
@@ -53,7 +53,7 @@ class UploadCommand extends Command
             $output->writeln("<error>Failed</error>");
 
             if ($ex instanceof ClientException) {
-                $output->writeln('<error>' . \Psr7\str($e->getResponse()) . '</error>');
+                $output->writeln('<error>' . $ex->getResponse()->getBody()->getContents() . '</error>');
 
                 return 1;
             }
@@ -116,7 +116,7 @@ class UploadCommand extends Command
         if ( ! empty($name)) {
             return $name;
         }
-        
+
         $repoInspector = new RepositoryIntrospector(getcwd());
 
         return $repoInspector->getQualifiedName();

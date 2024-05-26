@@ -1,3 +1,2 @@
 vendor/
-/ocular.phar
-/.phpunit.result.cache
+composer.lock

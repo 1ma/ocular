@@ -2,16 +2,18 @@
 
 namespace Scrutinizer\Tests\Ocular\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Scrutinizer\Ocular\Util\RepositoryIntrospector;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class RepositoryInspectorTest extends \PHPUnit\Framework\TestCase
+class RepositoryIntrospectorTest extends TestCase
 {
     private $tmpDirs = array();
 
-    public function repoUrlProvider()
+    public static function repoUrlProvider()
     {
         return [
             ['git@github.com:schmittjoh/metadata.git'],
@@ -20,11 +22,13 @@ class RepositoryInspectorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider repoUrlProvider
-     */
+    #[DataProvider('repoUrlProvider')]
     public function testGetQualifiedName($url)
     {
+        if ($url === 'git@github.com:schmittjoh/metadata.git') {
+            $this->markTestSkipped('Breaks on GitHub actions because it needs a private SSH key registered on GitHub');
+        }
+
         $tmpDir = $this->getTempDir();
         $this->installRepository($url, $tmpDir);
 
