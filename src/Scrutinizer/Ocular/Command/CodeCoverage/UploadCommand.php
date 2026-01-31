@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UploadCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('code-coverage:upload')
