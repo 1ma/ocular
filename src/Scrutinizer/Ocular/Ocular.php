@@ -31,7 +31,7 @@ class Ocular extends Application
 
     private function registerCommands()
     {
-        $this->add(new Command\CodeCoverage\UploadCommand());
+        $this->addCommand(new Command\CodeCoverage\UploadCommand());
     }
 
     private function loadConfiguration()
